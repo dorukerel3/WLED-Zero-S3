@@ -1,0 +1,9 @@
+"Id";"Designator";"Footprint";"Quantity";"Designation";"Supplier and ref";
+1;"0.1uF_1, 0.1uF_2, 0.1uF_3, 0.1uF_4, 0.1uF_5, 0.1uF_6, 0.1uF_7";"C_0805_2012Metric_Pad1.18x1.45mm_HandSolder";7;"C";;;
+2;"5V";"TestPoint_Pad_3.0x3.0mm";1;"5V";;;
+3;"D1, D2, D3, D4, D5, D6, D10, D11, D12, D13, D14";"LED_WS2812B_PLCC4_5.0x5.0mm_P3.2mm";11;"WS2812B";;;
+4;"DIN";"TestPoint_Pad_3.0x3.0mm";1;"DIN";;;
+5;"DOUT";"TestPoint_Pad_3.0x3.0mm";1;"DOUT";;;
+6;"GND";"TestPoint_Pad_3.0x3.0mm";1;"GND";;;
+7;"VDD";"TestPoint_Pad_3.0x3.0mm";1;"VDD";;;
+8;"VSS";"TestPoint_Pad_3.0x3.0mm";1;"VSS";;;
