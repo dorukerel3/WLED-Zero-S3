@@ -1,7 +1,6 @@
 # Custom WLED Board (ESP32-S3)
 
-A custom firmware build of [WLED](https://github.com/wled/WLED) v16.0.1, targeting a bare **ESP32-S3-WROOM-1-N16R8** module driving an addressable LED strip through a GPIO-switched MOSFET power stage. Developed as the firmware layer for a custom-designed LED controller board, the build is configured so that a freshly flashed unit ships with LEDs off and correct power-switch polarity by default, with no post-flash configuration required. PCB fabrication and assembly (motherboard and light stick designs) are documented separately via their own Gerber deliverables and are outside the scope of this repository.
-
+A custom firmware build of [WLED](https://github.com/wled/WLED) v16.0.1, targeting a bare **ESP32-S3-WROOM-1-N16R8** module driving an addressable LED strip through a GPIO-switched MOSFET power stage. Developed as the firmware layer for a custom-designed LED controller board, the build is configured so that a freshly flashed unit ships with LEDs off and correct power-switch polarity by default, with no post-flash configuration required. PCB fabrication and assembly (motherboard and light stick designs) are documented in this repository as well.
 ---
 
 ## Table of Contents
