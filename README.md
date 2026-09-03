@@ -1,28 +1,32 @@
 # WLED-Zero-S3
 
-A custom firmware build of [WLED](https://github.com/wled/WLED) v16.0.1, targeting a bare **ESP32-S3-WROOM-1-N16R8** module driving an addressable LED strip through a GPIO-switched MOSFET power stage. Developed as the firmware layer for a custom-designed LED controller board, the build is configured so that a freshly flashed unit ships with LEDs off and correct power-switch polarity by default, with no post-flash configuration required. PCB fabrication and assembly (motherboard and light stick designs) are documented in this repository as well.
+A complete, self-contained hardware and firmware project for a custom addressable LED lighting system: a custom-designed **ESP32-S3 controller motherboard**, three **daisy-chainable WS2812B light stick PCBs**, and a tailored build of **[WLED](https://github.com/wled/WLED) v16.0.1** configured for the exact hardware. This repository contains everything needed to reproduce the system end to end — Gerber and drill files, pick-and-place data, bills of materials, 3D STEP models, the full patched firmware source tree, and a pre-built single-file flash image.
+
 ---
 
 ## Table of Contents
 
 - [Project Overview](#project-overview)
 - [Hardware Gallery](#hardware-gallery)
+- [System Architecture](#system-architecture)
 - [Key Features](#key-features)
-- [Hardware Specifications](#hardware-specifications)
+- [Motherboard](#motherboard)
+- [Light Sticks](#light-sticks)
 - [Firmware Customizations](#firmware-customizations)
 - [Repository Contents](#repository-contents)
-- [Flashing a Pre-Built Release](#flashing-a-pre-built-release)
+- [Fabrication and Assembly Files](#fabrication-and-assembly-files)
+- [Flashing the Pre-Built Release](#flashing-the-pre-built-release)
 - [First Boot](#first-boot)
-- [Building from Source](#building-from-source)
+- [Building the Firmware from Source](#building-the-firmware-from-source)
 - [Author and License](#author-and-license)
 
 ---
 
 ## Project Overview
 
-This repository is a `v16.0.1` fork of WLED with a minimal, targeted set of changes on top: a PlatformIO build environment for the ESP32-S3-WROOM-1-N16R8 module, and a one-line source patch that makes the "turn on at boot" behavior a compile-time default instead of a runtime setting a user has to configure. Everything else is unmodified upstream WLED.
+The system consists of a controller motherboard and three purpose-built LED PCBs ("light sticks") of graduated lengths. The motherboard hosts a bare **ESP32-S3-WROOM-1-N16R8** module, USB-C power and programming, Li-ion battery charging, 3.3 V regulation, a 5 V logic-level shifter for the LED data line, and a MOSFET high-side power switch that lets the firmware cut power to the LED chain entirely.
 
-The goal is an appliance-grade default: a unit flashed straight from a release binary boots with its LED power stage off and correctly oriented for the board's MOSFET switching circuit, without requiring anyone to open the web UI and change settings first.
+The three light sticks carry **11**, **6**, and **4** WS2812B LEDs respectively — **21 in total**, which is exactly what the firmware is compiled for (`PIXEL_COUNTS=21`). The firmware is a minimal, targeted fork of WLED `v16.0.1`: one new build environment and a one-line source patch that makes the boot power state a compile-time default, so a freshly flashed unit ships with its LED power stage off and correct switch polarity, with zero post-flash configuration.
 
 ---
 
@@ -44,46 +48,112 @@ The physical production results of the custom-designed hardware, motherboard and
 
 ---
 
-## Key Features
+## System Architecture
 
-- **Off-by-default boot state**, via a new `WLED_TURN_ON_AT_BOOT` compile-time flag patched into WLED's source (upstream hardcodes this to always-on).
-- **Correct power-switch polarity out of the box**, matching the board's N-channel + P-channel MOSFET high-side switch topology.
-- **Single merged flashable image**, combining bootloader, partition table, and application into one `.bin` written at offset `0x0` — no multi-offset flashing required.
-- **16MB flash / 8MB octal PSRAM support**, targeting the ESP32-S3-WROOM-1-N16R8 module specifically.
-- **Built on a stable upstream release** (`v16.0.1`), with the fork's full commit history preserved for future upstream syncs.
+```text
+ USB-C (GCT USB4220) ──► TP4057 Li-ion charger ──► Battery (B+/B− pads)
+        │                                              │
+        └────────────► AP2112K-3.3 LDOs ──► 3.3 V rail ──► ESP32-S3-WROOM-1-N16R8
+                                                               │           │
+                                            GPIO1 (LED data) ──┘           └── GPIO2 (power switch)
+                                                   │                              │
+                                       74AHCT1G125 level shifter        N-MOS + P-MOS high-side switch
+                                                   │                              │
+                                                   ▼                              ▼
+                                     DIN ► Longest stick (11× WS2812B) ► Middle stick (6×) ► Shortest stick (4×)
+                                                        21 LEDs total, switched 5 V rail
+```
+
+- **Data path:** the ESP32-S3 drives the WS2812B chain from `GPIO1` through a **74AHCT1G125** buffer, shifting the 3.3 V signal to clean 5 V logic for reliable data at full supply voltage.
+- **Power path:** `GPIO2` controls an **N-channel + P-channel MOSFET high-side switch** (active-high) so the entire LED rail can be de-energized in software — true zero standby draw on the strip, not just black pixels.
+- **Chaining:** each stick exposes `5V`, `GND`, `DIN`/`DOUT` pads, so the three boards cascade into a single 21-pixel logical strip.
 
 ---
 
-## Hardware Specifications
+## Key Features
 
-| Component | Specification |
-|-----------|----------------|
-| Microcontroller | `ESP32-S3-WROOM-1-N16R8` — 16 MB flash, 8 MB octal-SPI PSRAM |
-| LED data pin | GPIO1 |
-| LED count | 21 |
-| Power switch pin | GPIO2, active-high, driving an N-channel + P-channel MOSFET high-side switch |
-| Flash configuration | 16 MB, DIO mode, 40 MHz |
+- **Off-by-default boot state**, via a new `WLED_TURN_ON_AT_BOOT` compile-time flag patched into WLED's source (upstream hardcodes it to always-on).
+- **Correct power-switch polarity out of the box** (`RLYPIN=2`), matched to the board's active-high MOSFET high-side switch topology.
+- **Single merged flashable image** — bootloader, partition table, and application combined into one `.bin` written at offset `0x0`. No multi-offset flashing.
+- **16 MB flash / 8 MB octal PSRAM support**, targeting the ESP32-S3-WROOM-1-N16R8 module specifically.
+- **Complete fabrication package** for all four PCBs: Gerbers, drill files, pick-and-place, BOM, and 3D STEP models.
+- **Built on a stable upstream release** (`v16.0.1`), with the full source tree preserved in-repo for reproducible builds and future upstream syncs.
+
+---
+
+## Motherboard
+
+| Component | Part | Package | Role |
+|-----------|------|---------|------|
+| U2 | ESP32-S3-WROOM-1 (N16R8) | RF module | MCU — 16 MB flash, 8 MB octal-SPI PSRAM, WiFi/BLE |
+| J3 | GCT USB4220-03-1040-C | USB-C receptacle | Power input and USB programming |
+| TP4057 | TP4057 | TSOT-23-6 | Single-cell Li-ion charge management |
+| AP2112_1, AP2112_2 | AP2112K-3.3 | SOT-23-5 | 3.3 V LDO regulation |
+| U4 | 74AHCT1G125 | SOT-23-5 | 3.3 V → 5 V LED data level shifting |
+| NMOSS1 | N-channel MOSFET | SOT-23 | Gate driver stage for the high-side switch |
+| PMOSS1 | P-channel MOSFET | SOT-23 | High-side power switch for the LED rail |
+| — | 8× resistors (2×1 kΩ, 2×5.1 kΩ, 3×10 kΩ, 1×330 Ω) | 0805 | Gate drive, CC1/CC2 termination, pull-ups, charge programming |
+| — | 2× 1 µF capacitors | 0805 | LDO input/output decoupling |
+| J2 | 1×4 pin header (DNP) | 2.54 mm | Auxiliary/debug header |
+| — | 5× test points (`5V`, `B+`, `B−`, `DIN`, `GND`) | 3.0 mm pads | Bring-up and battery/strip wiring |
+
+Full references, footprints, and datasheet links are in [`Motherboard_Files/Motherboard.csv`](Motherboard_Files/Motherboard.csv); exact placement coordinates in [`Motherboard_Files/Motherboard-all-pos.csv`](Motherboard_Files/Motherboard-all-pos.csv).
+
+### Firmware pin map
+
+| Signal | Pin | Configuration |
+|--------|-----|---------------|
+| LED data out | GPIO1 | `DATA_PINS=1` |
+| LED power switch | GPIO2 | `RLYPIN=2`, `RLYMDE=1` (active-high) |
+| LED count | — | `PIXEL_COUNTS=21` |
+| Flash | — | 16 MB, DIO, 40 MHz |
+
+---
+
+## Light Sticks
+
+Three variants of the same design language — a 5 V WS2812B chain with per-LED 0.1 µF decoupling and pad-based chaining:
+
+| Board | WS2812B count | Decoupling caps | Pads |
+|-------|---------------|-----------------|------|
+| Longest | 11 | 7× 0.1 µF | `5V`, `DIN`, `GND`, + |
+| Middle | 6 | 3× 0.1 µF | `5V`, `DOUT`, `GND`, TP1–TP3 |
+| Shortest | 4 | 2× 0.1 µF | `5V`, `DIN`, `DOUT`, `GND`, `VDD`, `VSS` |
+
+**Total: 21 LEDs**, matching the firmware's compiled pixel count exactly. All LEDs use the `WS2812B PLCC4 5.0×5.0 mm` footprint on a 3.2 mm pitch.
 
 ---
 
 ## Firmware Customizations
 
-Two changes on top of a clean `v16.0.1` checkout, both committed in this repository's history:
+Two changes on top of a clean `v16.0.1` checkout, both preserved in [`Motherboard_Files/firmware/`](Motherboard_Files/firmware/):
 
-**`platformio_override.ini`** (new file) defines the `esp32s3` build environment — pin assignments, LED count, relay/MOSFET pin and polarity, and release naming.
+**[`platformio_override.ini`](Motherboard_Files/firmware/platformio_override.ini)** (new file) defines the `esp32s3` build environment:
 
-**`wled00/wled.h`** carries a one-line patch exposing `turnOnAtBoot` as a build flag, since upstream WLED hardcodes it:
+```ini
+[env:esp32s3]
+extends = env:esp32s3dev_16MB_opi
+build_flags = ${env:esp32s3dev_16MB_opi.build_flags}
+  -D WLED_RELEASE_NAME=\"ESP32S3_Custom\"
+  -D DATA_PINS=1
+  -D PIXEL_COUNTS=21
+  -D RLYPIN=2
+  -D RLYMDE=1
+  -D WLED_TURN_ON_AT_BOOT=false
+```
+
+**[`wled00/wled.h`](Motherboard_Files/firmware/wled00/wled.h)** carries a one-line patch exposing `turnOnAtBoot` as a build flag, since upstream WLED hardcodes it:
 
 ```diff
 // LED CONFIG
--WLED_GLOBAL bool turnOnAtBoot _INIT(true);                // turn on LEDs at power-up
+-WLED_GLOBAL bool turnOnAtBoot _INIT(true);                 // turn on LEDs at power-up
 +#ifndef WLED_TURN_ON_AT_BOOT
 +  #define WLED_TURN_ON_AT_BOOT true
 +#endif
 +WLED_GLOBAL bool turnOnAtBoot _INIT(WLED_TURN_ON_AT_BOOT); // turn on LEDs at power-up
 ```
 
-This build sets the flag to `false`, so the power stage never energizes without explicit user action.
+This build sets the flag to `false`, so the LED power stage never energizes without explicit user action.
 
 ---
 
@@ -91,23 +161,38 @@ This build sets the flag to `false`, so the power stage never energizes without 
 
 ```text
 .
-├── wled00/                 WLED firmware source (patched: wled.h)
-├── boards/                 Board pin-mapping definitions
-├── lib/                    Bundled third-party libraries
-├── tools/                  Build tooling and custom partition tables
-├── platformio.ini          Upstream WLED build environments
-├── platformio_override.ini Custom esp32s3 build environment (this fork's config)
-├── LICENSE                 Upstream MIT license
-└── readme.md
+├── Motherboard_Files/
+│   ├── firmware/                                        Full WLED v16.0.1 source tree (patched: wled00/wled.h,
+│   │                                                    new: platformio_override.ini)
+│   ├── WLED_16.0.1_ESP32-S3_16MB_opi_MERGED_dio40m_v2.bin   Pre-built merged flash image (write at 0x0)
+│   ├── Motherboard_Gerber&Drill.zip                     Fabrication files (Cu, mask, paste, silkscreen, edge cuts, PTH/NPTH drill)
+│   ├── Motherboard.csv                                  Bill of materials
+│   ├── Motherboard-all-pos.csv                          Pick-and-place component positions
+│   └── Motherboard_Design.step                          3D model
+├── Longest_Light_Stick_Files/                           Gerbers & drill, BOM, pick-and-place, STEP (11× WS2812B)
+├── Middle_Light_Stick_Files/                            Gerbers & drill, BOM, pick-and-place, STEP (6× WS2812B)
+├── Shortest_Light_Stick_Files/                          Gerbers & drill, BOM, pick-and-place, STEP (4× WS2812B)
+├── images/                                              README assets
+├── LICENSE                                              MIT license
+└── README.md
 ```
-
-The repository is otherwise a standard WLED checkout — see the [upstream project](https://github.com/wled/WLED) for full documentation on the underlying firmware.
 
 ---
 
-## Flashing a Pre-Built Release
+## Fabrication and Assembly Files
 
-1. Download the latest merged `.bin` from the Motherboard_Files folder.
+Each of the four PCB folders is a complete manufacturing package:
+
+- **`*_Gerber&Drill.zip`** — full Gerber set (front/back copper, solder mask, paste, silkscreen, board outline) plus PTH and NPTH Excellon drill files, ready to upload to any fab (JLCPCB, PCBWay, etc.).
+- **`*.csv`** — the bill of materials with references, quantities, footprints, and datasheet links.
+- **`*-all-pos.csv`** — pick-and-place position files (X/Y, rotation, side) for assembly services.
+- **`*.step`** — 3D STEP models for enclosure design and mechanical verification.
+
+---
+
+## Flashing the Pre-Built Release
+
+1. Download [`Motherboard_Files/WLED_16.0.1_ESP32-S3_16MB_opi_MERGED_dio40m_v2.bin`](Motherboard_Files/WLED_16.0.1_ESP32-S3_16MB_opi_MERGED_dio40m_v2.bin).
 2. Install [esptool](https://github.com/espressif/esptool):
    ```bash
    python -m pip install esptool
@@ -116,9 +201,9 @@ The repository is otherwise a standard WLED checkout — see the [upstream proje
 4. Erase and flash (replace `COMx` with the board's serial port):
    ```bash
    python -m esptool --chip esp32s3 --port COMx erase_flash
-   python -m esptool --chip esp32s3 --port COMx --baud 921600 write_flash 0x0 WLED_ESP32-S3_16MB_opi_MERGED.bin
+   python -m esptool --chip esp32s3 --port COMx --baud 921600 write_flash 0x0 WLED_16.0.1_ESP32-S3_16MB_opi_MERGED_dio40m_v2.bin
    ```
-   The image is a single merge of bootloader, partition table, and application, so it's written at offset `0x0` with no further offsets needed.
+   The image is a single merge of bootloader, partition table, and application, so it is written at offset `0x0` with no further offsets needed.
 
 ---
 
@@ -131,20 +216,20 @@ The repository is otherwise a standard WLED checkout — see the [upstream proje
 
 ---
 
-## Building from Source
+## Building the Firmware from Source
 
 ```bash
-git clone <this-repo-url>
-cd <this-repo>
+git clone https://github.com/dorukerel3/WLED-Zero-S3.git
+cd WLED-Zero-S3/Motherboard_Files/firmware
 python -m pip install platformio
 python -m platformio run -e esp32s3
 ```
 
-This produces `.pio/build/esp32s3/firmware.bin` (application only). To reproduce the merged, single-file release image:
+This produces `.pio/build/esp32s3/firmware.bin` (application only). To reproduce the merged single-file release image:
 
 ```bash
 python -m esptool --chip esp32s3 merge_bin \
-  -o WLED_ESP32-S3_16MB_opi_MERGED.bin \
+  -o WLED_16.0.1_ESP32-S3_16MB_opi_MERGED_dio40m_v2.bin \
   --flash_mode dio --flash_freq 40m --flash_size 16MB \
   0x0     .pio/build/esp32s3/bootloader.bin \
   0x8000  .pio/build/esp32s3/partitions.bin \
@@ -155,6 +240,6 @@ python -m esptool --chip esp32s3 merge_bin \
 
 ## Author and License
 
-Developed by **Doruk Erel**.
+Designed and developed by **Doruk Erel** — [dorukerel.com](https://dorukerel.com).
 
-Based on [WLED](https://github.com/wled/WLED). Released under the **MIT License**. See the `LICENSE` file for the full text.
+Firmware based on [WLED](https://github.com/wled/WLED). Released under the **MIT License**. See the [`LICENSE`](LICENSE) file for the full text.
