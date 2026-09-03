@@ -1,0 +1,13 @@
+Ref,Val,Package,PosX,PosY,Rot,Side
+"0.1uF_2","C","C_0805_2012Metric_Pad1.18x1.45mm_HandSolder",102.000000,-35.000000,-90.000000,bottom
+"0.1uF_1","C","C_0805_2012Metric_Pad1.18x1.45mm_HandSolder",151.000000,-35.000000,-90.000000,top
+"5V","TestPoint_Square","TestPoint_Pad_3.0x3.0mm",92.000000,-32.000000,0.000000,top
+"D1","WS2812B","LED_WS2812B_PLCC4_5.0x5.0mm_P3.2mm",102.000000,-35.000000,-90.000000,top
+"D2","WS2812B","LED_WS2812B_PLCC4_5.0x5.0mm_P3.2mm",120.000000,-35.000000,-90.000000,top
+"D3","WS2812B","LED_WS2812B_PLCC4_5.0x5.0mm_P3.2mm",142.000000,-35.000000,-90.000000,top
+"D4","WS2812B","LED_WS2812B_PLCC4_5.0x5.0mm_P3.2mm",165.000000,-35.000000,-90.000000,top
+"DIN","TestPoint_Square","TestPoint_Pad_3.0x3.0mm",96.000000,-35.000000,0.000000,top
+"DOUT","TestPoint_Square","TestPoint_Pad_3.0x3.0mm",171.000000,-35.000000,0.000000,top
+"GND","TestPoint_Square","TestPoint_Pad_3.0x3.0mm",92.000000,-38.000000,0.000000,top
+"VDD","TestPoint_Square","TestPoint_Pad_3.0x3.0mm",175.000000,-32.000000,0.000000,top
+"VSS","TestPoint_Square","TestPoint_Pad_3.0x3.0mm",175.000000,-38.000000,0.000000,top
