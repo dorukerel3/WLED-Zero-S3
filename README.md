@@ -21,7 +21,7 @@ A custom firmware build of [WLED](https://github.com/wled/WLED) v16.0.1, targeti
 
 ## Project Overview
 
-This repository is a `v16.0.1` fork of WLED with a minimal, targeted set of changes on top: a PlatformIO build environment for the ESP32-S3-WROOM-1-N16R8 module, and a one-line source patch that makes the "turn on at boot" behavior a compile-time default instead of a runtime setting a user has to configure. Everything else is unmodified upstream WLED, retained via full git history so the fork can track future upstream releases.
+This repository is a `v16.0.1` fork of WLED with a minimal, targeted set of changes on top: a PlatformIO build environment for the ESP32-S3-WROOM-1-N16R8 module, and a one-line source patch that makes the "turn on at boot" behavior a compile-time default instead of a runtime setting a user has to configure. Everything else is unmodified upstream WLED.
 
 The goal is an appliance-grade default: a unit flashed straight from a release binary boots with its LED power stage off and correctly oriented for the board's MOSFET switching circuit, without requiring anyone to open the web UI and change settings first.
 
