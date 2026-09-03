@@ -108,7 +108,7 @@ The repository is otherwise a standard WLED checkout — see the [upstream proje
 
 ## Flashing a Pre-Built Release
 
-1. Download the latest merged `.bin` from the [Motherboard_Files] tab.
+1. Download the latest merged `.bin` from the Motherboard_Files folder.
 2. Install [esptool](https://github.com/espressif/esptool):
    ```bash
    python -m pip install esptool
