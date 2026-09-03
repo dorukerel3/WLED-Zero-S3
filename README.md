@@ -62,7 +62,7 @@ The physical production results of the custom-designed hardware, motherboard and
 | Microcontroller | `ESP32-S3-WROOM-1-N16R8` — 16 MB flash, 8 MB octal-SPI PSRAM |
 | LED data pin | GPIO1 |
 | LED count | 21 |
-| Power switch pin | GPIO2, active-low, driving an N-channel + P-channel MOSFET high-side switch |
+| Power switch pin | GPIO2, active-high, driving an N-channel + P-channel MOSFET high-side switch |
 | Flash configuration | 16 MB, DIO mode, 40 MHz |
 
 ---
