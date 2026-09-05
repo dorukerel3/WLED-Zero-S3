@@ -73,7 +73,7 @@ The physical production results of the custom-designed hardware, motherboard and
 ## Key Features
 
 - **Off-by-default boot state**, via a new `WLED_TURN_ON_AT_BOOT` compile-time flag patched into WLED's source (upstream hardcodes it to always-on).
-- **Correct power-switch polarity out of the box** (`RLYPIN=2`), matched to the board's active-high MOSFET high-side switch topology.
+- **Correct power-switch polarity out of the box** (`RLYPIN=2`, `RLYMDE=1`), matched to the board's active-high MOSFET high-side switch topology.
 - **Single merged flashable image** — bootloader, partition table, and application combined into one `.bin` written at offset `0x0`. No multi-offset flashing.
 - **16 MB flash / 8 MB octal PSRAM support**, targeting the ESP32-S3-WROOM-1-N16R8 module specifically.
 - **Complete fabrication package** for all four PCBs: Gerbers, drill files, pick-and-place, BOM, and 3D STEP models.
@@ -169,12 +169,32 @@ This build sets the flag to `false`, so the LED power stage never energizes with
 │   ├── Motherboard.csv                                  Bill of materials
 │   ├── Motherboard-all-pos.csv                          Pick-and-place component positions
 │   └── Motherboard_Design.step                          3D model
-├── Longest_Light_Stick_Files/                           Gerbers & drill, BOM, pick-and-place, STEP (11× WS2812B)
-├── Middle_Light_Stick_Files/                            Gerbers & drill, BOM, pick-and-place, STEP (6× WS2812B)
-├── Shortest_Light_Stick_Files/                          Gerbers & drill, BOM, pick-and-place, STEP (4× WS2812B)
-├── images/                                              README assets
+├── Longest_Light_Stick_Files/                           11× WS2812B — pads: 5V, DIN, GND
+│   ├── Longest_light_stick_Gerber&Drill.zip             Fabrication files (Cu, mask, paste, silkscreen, edge cuts, PTH/NPTH drill)
+│   ├── Longest_light_stick.csv                          Bill of materials (11× WS2812B, 7× 0.1 µF 0805)
+│   ├── Longest_light_stick-all-pos.csv                  Pick-and-place component positions
+│   └── Longest_Light_Stick_Design.step                  3D model
+├── Middle_Light_Stick_Files/                            6× WS2812B — pads: 5V, DOUT, GND, TP1–TP3
+│   ├── Middle_light_stick_Gerber&Drill.zip              Fabrication files (Cu, mask, paste, silkscreen, edge cuts, PTH/NPTH drill)
+│   ├── Middle_light_stick.csv                           Bill of materials (6× WS2812B, 3× 0.1 µF 0805)
+│   ├── Middle_light_stick-all-pos.csv                   Pick-and-place component positions
+│   └── Middle_Light_Stick_Design.STEP                   3D model
+├── Shortest_Light_Stick_Files/                          4× WS2812B — pads: 5V, DIN, DOUT, GND, VDD, VSS
+│   ├── Shortest_light_stick_Gerber&Drill.zip            Fabrication files (Cu, mask, paste, silkscreen, edge cuts, PTH/NPTH drill)
+│   ├── Shortest_light_stick.csv                         Bill of materials (4× WS2812B, 2× 0.1 µF 0805)
+│   ├── Shortest_light_stick-all-pos.csv                 Pick-and-place component positions
+│   └── Shortest_Light_Stick_Design.STEP                 3D model
+├── images/                                              README gallery assets
+│   ├── motherboard_front.jpg                            Assembled motherboard, component side
+│   ├── motherboard_back.jpg                             Assembled motherboard, reverse side
+│   ├── led_strip_longest_front.jpg                      Longest light stick, LED side
+│   ├── led_strip_longest_back.jpg                       Longest light stick, reverse side
+│   ├── led_strip_middle_front.jpg                       Middle light stick, LED side
+│   ├── led_strip_middle_back.jpg                        Middle light stick, reverse side
+│   ├── led_strip_shortest_front.jpg                     Shortest light stick, LED side
+│   └── led_strip_shortest_back.jpg                      Shortest light stick, reverse side
 ├── LICENSE                                              MIT license
-└── README.md
+└── README.md                                            This document
 ```
 
 ---
