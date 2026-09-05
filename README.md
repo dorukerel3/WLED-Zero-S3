@@ -237,7 +237,7 @@ Each of the four PCB folders is a complete manufacturing package:
 ---
 
 <p align="center">
-  <img src="images/wled_logo_akemi.png" width="220" alt="WLED Akemi logo">
+  <img src="https://raw.githubusercontent.com/wled/WLED/main/images/wled_logo_akemi.png" width="220" alt="WLED Akemi logo">
 </p>
 
 ## Building the Firmware from Source
