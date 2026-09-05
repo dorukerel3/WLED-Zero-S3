@@ -1,0 +1,12 @@
+"Id";"Designator";"Footprint";"Quantity";"Designation";"Supplier and ref";
+1;"1KOHM_1, 1KOHM_2, 5.1kohm_1, 5.1kohm_2, 10Kohm_1, 10Kohm_2, 10Kohm_3, 10Kohm_4, 10Kohm_5, 330ohm_1";"R_0805_2012Metric_Pad1.20x1.40mm_HandSolder";10;"R";;;
+2;"1uF_1, 1uF_2";"C_0805_2012Metric_Pad1.18x1.45mm_HandSolder";2;"C";;;
+3;"5V1, B+1, B-1, DIN1, GND1";"TestPoint_Pad_3.0x3.0mm";5;"TestPoint_Square";;;
+4;"74AHCT1G125";"SOT-23-5_HandSoldering";1;"74AHCT1G125";;;
+5;"AP2112_1, AP2112_2";"SOT-23-5";2;"AP2112K-3.3";;;
+6;"J2";"PinHeader_1x04_P2.54mm_Vertical";1;"Conn_01x04";;;
+7;"J3";"GCT_USB4220-03-1040-C_REVA";1;"USB4220-03-1040-C_REVA";;;
+8;"NMOSS1, NMOSS2";"SOT-23";2;"Q_NMOS_GSD";;;
+9;"PMOSS1, PMOSS2";"SOT-23";2;"Q_PMOS_GSD";;;
+10;"TP4057";"TSOT-23-6";1;"TP4057";;;
+11;"U2";"ESP32-S3-WROOM-1";1;"ESP32-S3-WROOM-1";;;
