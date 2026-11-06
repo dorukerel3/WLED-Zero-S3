@@ -1,0 +1,17 @@
+"Id";"Designator";"Footprint";"Quantity";"Designation";"Supplier and ref";
+1;"1KOHM_1, 1KOHM_2, 5.1kohm_1, 5.1kohm_2, 10Kohm_1, 10Kohm_2, 10Kohm_3, 10Kohm_4, 330ohm_1";"R_0805_2012Metric_Pad1.20x1.40mm_HandSolder";9;"R";;;
+2;"1uF_1, 1uF_2";"C_0805_2012Metric_Pad1.18x1.45mm_HandSolder";2;"C";;;
+3;"5V1, B+1, B-1, DIN1, GND1";"TestPoint_Pad_3.0x3.0mm";5;"TestPoint_Square";;;
+4;"10uF_1, 10uF_2, 10uF_3";"C_0805_2012Metric_Pad1.18x1.45mm_HandSolder";3;"10uF";;;
+5;"20KOhm_1";"R_0805_2012Metric_Pad1.20x1.40mm_HandSolder";1;"20K";;;
+6;"74AHCT1G125";"SOT-23-5_HandSoldering";1;"74AHCT1G125";;;
+7;"147KOhm_1";"R_0805_2012Metric_Pad1.20x1.40mm_HandSolder";1;"147K";;;
+8;"AP2112_1, AP2112_2";"SOT-23-5";2;"AP2112K-3.3";;;
+9;"D_Schottky_1, D_Schottky_2";"D_SMA_Handsoldering";2;"D_Schottky";;;
+10;"ESP32-S3-WROOM-1";"ESP32-S3-WROOM-1";1;"ESP32-S3-WROOM-1";;;
+11;"IC1";"SOTFL50P160X60-6N";1;"TPS61023DRLR";;;
+12;"Inductor_1";"L_Bourns_SRP5030T";1;"2.2µH";;;
+13;"J3";"GCT_USB4220-03-1040-C_REVA";1;"USB4220-03-1040-C_REVA";;;
+14;"NMOSS1";"SOT-23";1;"Q_NMOS_GSD";;;
+15;"PMOSS1";"SOT-23";1;"Q_PMOS_GSD";;;
+16;"TP4057";"TSOT-23-6";1;"TP4057";;;
